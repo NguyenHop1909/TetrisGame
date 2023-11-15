@@ -139,8 +139,8 @@ shape_colors = [(0, 255, 0), (255, 0, 0), (0, 255, 255), (255, 255, 0), (255, 16
 
 
 class Piece(object):
-    rows = 20 # chieu cao (y)
-    columns = 10 # chieu ngang (x)
+    rows = 10 # chieu cao (y)
+    columns = 20 # chieu ngang (x)
     
     def __init__(self, column, row, shape):
         self.x = column
@@ -234,6 +234,7 @@ def clear_rows(grid, locked):
             if y < ind:
                 newKey = (x, y + inc)
                 locked[newKey] = locked.pop(key)
+                
     return inc
                 
 
@@ -247,9 +248,9 @@ def draw_next_shape(shape, surface):
     
     for i, line in enumerate(format):
         row = list(line)
-    for j, column in enumerate(row):
-        if column == '0':
-            pygame.draw.rect(surface, shape.color, (sx +j*30, sy + i*30, 30, 30), 0)
+        for j, column in enumerate(row):
+            if column == '0':
+                pygame.draw.rect(surface, shape.color, (sx +j*30, sy + i*30, 30, 30), 0)
     
     surface.blit(label, (sx + 10, sy - 30))
 
@@ -282,7 +283,7 @@ def draw_window(surface, grid, score=0, last_score=0):
     
     #current score
     font = pygame.font.SysFont('comicsans', 30)
-    label = font.render('Score' + str(score), 1, (255,255,255))
+    label = font.render('Score: ' + str(score), 1, (255,255,255))
     
     sx = top_left_x + play_width + 50
     sy = top_left_y + play_height/2 - 100
@@ -290,10 +291,10 @@ def draw_window(surface, grid, score=0, last_score=0):
     surface.blit(label, (sx + 20, sy + 160))
     
     #last score
-    label = font.render('High Score' + last_score, 1, (255,255,255))
+    label = font.render('High Score: ' + last_score, 1, (255,255,255))
     
-    sx = top_left_x - 100
-    sy = top_left_y + 400
+    sx = top_left_x - 250
+    sy = top_left_y + 200
     
     surface.blit(label, (sx + 20, sy + 160))
     
@@ -381,10 +382,10 @@ def main(win):
             for pos in shape_pos:
                 p = (pos[0], pos[1])
                 locked_positions[p] = current_piece.color
-                current_piece = next_piece
-                next_piece = get_shape()
-                change_piece = False
-                score += clear_rows(grid, locked_positions) * 10
+            current_piece = next_piece
+            next_piece = get_shape()
+            change_piece = False
+            score += clear_rows(grid, locked_positions) * 10
         
           
         draw_window(win, grid, score, last_score)
@@ -397,7 +398,13 @@ def main(win):
             pygame.time.delay(1500)
             run = False
             update_score(score)
-    pygame.display.quit()
+            
+    if event.type == pygame.QUIT:
+        run = False
+        pygame.display.quit()
+    if event.type == pygame.KEYDOWN:
+        main(win)
+    
 
 def main_menu(win):
     run = True
